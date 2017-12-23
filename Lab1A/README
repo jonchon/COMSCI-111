@@ -1,0 +1,17 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+lab1a.c
+This file contains the source code of the project. It reads and writes one character at a time and passes input/output between two processes.
+
+Makefile
+The Makefile includes make clean, make dist, and make default. The make default is the default for make. Make clean removes the tar file and the executable, make dist creates the tar file, and make default compiles the code.
+
+In order to learn more about the system calls, I mainly used the man pages.
+
+I also used the following websites:
+https://stackoverflow.com/questions/27541910/how-to-use-execvp
+http://beej.us/guide/bgnet/output/html/multipage/pollman.html
+https://stackoverflow.com/questions/18935446/program-received-signal-sigpipe-broken-pipe
+https://www.gnu.org/software/libc/manual/html_node/Process-Completion-Status.html
