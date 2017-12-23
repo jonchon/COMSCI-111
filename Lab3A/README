@@ -1,0 +1,12 @@
+NAME: Jonathan Chon, William Tan
+EMAIL: jonchon@gmail.com, willtan510@gmail.com
+ID: 104780881, 104770108
+
+Makefile:
+Includes targets to default, which creates the executable from the source file, clean, which removes all output from the Makefile, and dist, which creates the tarball
+
+README:
+Contains information about each file
+
+lab3a.c:
+The source file which explores the EXT2 filesytem structures through the different conventions and implementations to hold persistent data in this type of filesystem. Data from the superblock, groups, free block and inode entries, and inodes were processed and outputted through this implementation.
