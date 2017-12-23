@@ -1,0 +1,12 @@
+NAME: Jonathan Chon, William Tan
+EMAIL: jonchon@gmail.com, willtan510@gmail.com
+ID: 104780881, 104770108
+
+lab3b.py
+Python program that processes a given .csv file to output any inconsistencies in the filesystem regarding the blocks, inodes, and directories. A message is outputted for each inconsistency that is found during execution of the program 
+
+Makefile
+File that builds the executable, the tar file, and cleanses the directory of them if specified. 
+
+README
+This file which describes the other files
