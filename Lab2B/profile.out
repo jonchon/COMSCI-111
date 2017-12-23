@@ -1,0 +1,269 @@
+Total: 806 samples
+     634  78.7%  78.7%      806 100.0% list_ops
+     141  17.5%  96.2%      141  17.5% __strcmp_sse42
+      14   1.7%  97.9%       85  10.5% SortedList_insert
+      10   1.2%  99.1%       87  10.8% SortedList_lookup
+       7   0.9% 100.0%        7   0.9% _init
+       0   0.0% 100.0%      806 100.0% __clone
+       0   0.0% 100.0%       87  10.8% lookup_and_delete
+       0   0.0% 100.0%      806 100.0% start_thread
+ROUTINE ====================== list_ops in /u/cs/ugrad/chon/cs111/lab2/part2/lab2_list.c
+   634    806 Total samples (flat / cumulative)
+     .      .  127: {
+     .      .  128:   return 1000000000 * (end->tv_sec - start->tv_sec) + (end->tv_nsec - start->tv_nsec);
+     .      .  129: }
+     .      .  130: 
+     .      .  131: void * list_ops(void* index)  //CHANGE
+---
+     .      .  132: {
+     .      .  133:   int i;
+     .      .  134:   struct timespec lock_start, lock_end;
+     .      .  135:   int list_len = 0;
+     .      .  136:   long temp_time = 0;
+     .      .  137: 
+     .      .  138:   //inserts into list
+     .      .  139:   for (i = *(int *)index; i < op_num; i += thread_num)
+     .      .  140:     {
+     .      .  141:       if (opt_sync == 'm')
+     .      .  142: 	{
+     .      .  143:        	  check_clock(&lock_start);
+     .      .  144: 	  pthread_mutex_lock(&mutex[list_ind[i]]);
+     .      .  145:        	  check_clock(&lock_end);
+     .      .  146: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  147: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  148: 	  pthread_mutex_unlock(&mutex[list_ind[i]]);	  
+     .      .  149: 	}
+     .      .  150:       else if (opt_sync == 's')
+     .      .  151: 	{
+     .      .  152:        	  check_clock(&lock_start);
+   405    405  153: 	  while (__sync_lock_test_and_set(&spin[list_ind[i]], 1));
+     .      .  154: 	  check_clock(&lock_end);
+     .      .  155:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .     85  156: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  157: 	  __sync_lock_release(&spin[list_ind[i]]);
+     .      .  158: 	}
+     .      .  159:       else
+     .      .  160: 	{
+     .      .  161: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  162: 	}
+     .      .  163:     } 
+     .      .  164: 
+     .      .  165:   //Checks length
+     .      .  166:   if (opt_sync == 'm')
+     .      .  167:     {
+     .      .  168:       for (i = 0; i < list_num; i++)
+     .      .  169: 	{
+     .      .  170: 	  int temp_len = 0;
+     .      .  171: 	  //local structure
+     .      .  172: 	  check_clock(&lock_start);
+     .      .  173: 	  pthread_mutex_lock(&mutex[i]);
+     .      .  174:       	  check_clock(&lock_end);
+     .      .  175:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  176: 	  temp_len = check_length(&list[i]);
+     .      .  177: 	  pthread_mutex_unlock(&mutex[i]);
+     .      .  178: 	  
+     .      .  179: 	  //global structure
+     .      .  180:           check_clock(&lock_start);
+     .      .  181: 	  pthread_mutex_lock(&global_mutex);
+     .      .  182:           check_clock(&lock_end);
+     .      .  183:        	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  184: 	  list_len += temp_len;
+     .      .  185: 	  pthread_mutex_unlock(&global_mutex);
+     .      .  186: 	}
+     .      .  187:     }
+     .      .  188:   else if (opt_sync == 's')
+     .      .  189:     {
+     .      .  190:       for (i = 0; i < list_num; i++)
+     .      .  191: 	{
+     .      .  192: 	  //local structure
+     .      .  193: 	  int temp_len = 0;
+     .      .  194:        	  check_clock(&lock_start);
+     1      1  195: 	  while (__sync_lock_test_and_set(&spin[i], 1));
+     .      .  196:       	  check_clock(&lock_end);
+     .      .  197:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  198: 	  temp_len = check_length(&list[i]);
+     .      .  199: 	  __sync_lock_release(&spin[i]);
+     .      .  200: 	  
+     .      .  201: 	  //global structure
+     .      .  202:           check_clock(&lock_start);
+     .      .  203: 	  while (__sync_lock_test_and_set(&global_spin, 1));
+     .      .  204: 	  check_clock(&lock_end);
+     .      .  205: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  206: 	  list_len += temp_len;
+     .      .  207: 	  __sync_lock_release(&global_spin);
+     .      .  208: 	}
+     .      .  209:     }
+     .      .  210:   else
+     .      .  211:     {
+     .      .  212:       for (i = 0; i < list_num; i++)
+     .      .  213: 	{
+     .      .  214: 	  int temp_len = 0;
+     .      .  215: 	  temp_len = check_length(&list[i]);
+     .      .  216: 	  list_len += temp_len;
+     .      .  217: 	}
+     .      .  218:     }
+     .      .  219: 
+     .      .  220:   //looksup and deletes
+     .      .  221:   for (i = *(int*)index; i < op_num; i += thread_num)
+     .      .  222:     {
+     .      .  223:       if (opt_sync == 'm')
+     .      .  224: 	{
+     .      .  225:  	  check_clock(&lock_start);
+     .      .  226: 	  pthread_mutex_lock(&mutex[list_ind[i]]);
+     .      .  227:        	  check_clock(&lock_end);
+     .      .  228: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  229: 	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  230: 	  pthread_mutex_unlock(&mutex[list_ind[i]]);
+     .      .  231: 	}
+     .      .  232:       else if (opt_sync == 's')
+     .      .  233: 	{
+     .      .  234:        	  check_clock(&lock_start);
+   228    228  235: 	  while(__sync_lock_test_and_set(&spin[list_ind[i]], 1));
+     .      .  236:       	  check_clock(&lock_end);
+     .      .  237: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .     87  238: 	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  239: 	  __sync_lock_release(&spin[list_ind[i]]);
+     .      .  240: 	}
+     .      .  241:       else
+     .      .  242: 	{
+     .      .  243:        	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  244: 	}
+     .      .  245:     }  
+     .      .  246:   return (void *) temp_time;
+     .      .  247: }
+---
+     .      .  248: 
+     .      .  249: int main (int argc, char ** argv)
+     .      .  250: {
+     .      .  251:   int opt;
+     .      .  252:   int i;
+ROUTINE ====================== list_ops in /u/cs/ugrad/chon/cs111/lab2/part2/lab2_list.c
+   634    806 Total samples (flat / cumulative)
+     .      .  127: {
+     .      .  128:   return 1000000000 * (end->tv_sec - start->tv_sec) + (end->tv_nsec - start->tv_nsec);
+     .      .  129: }
+     .      .  130: 
+     .      .  131: void * list_ops(void* index)  //CHANGE
+---
+     .      .  132: {
+     .      .  133:   int i;
+     .      .  134:   struct timespec lock_start, lock_end;
+     .      .  135:   int list_len = 0;
+     .      .  136:   long temp_time = 0;
+     .      .  137: 
+     .      .  138:   //inserts into list
+     .      .  139:   for (i = *(int *)index; i < op_num; i += thread_num)
+     .      .  140:     {
+     .      .  141:       if (opt_sync == 'm')
+     .      .  142: 	{
+     .      .  143:        	  check_clock(&lock_start);
+     .      .  144: 	  pthread_mutex_lock(&mutex[list_ind[i]]);
+     .      .  145:        	  check_clock(&lock_end);
+     .      .  146: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  147: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  148: 	  pthread_mutex_unlock(&mutex[list_ind[i]]);	  
+     .      .  149: 	}
+     .      .  150:       else if (opt_sync == 's')
+     .      .  151: 	{
+     .      .  152:        	  check_clock(&lock_start);
+   405    405  153: 	  while (__sync_lock_test_and_set(&spin[list_ind[i]], 1));
+     .      .  154: 	  check_clock(&lock_end);
+     .      .  155:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .     85  156: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  157: 	  __sync_lock_release(&spin[list_ind[i]]);
+     .      .  158: 	}
+     .      .  159:       else
+     .      .  160: 	{
+     .      .  161: 	  SortedList_insert(&list[list_ind[i]], &element[i]);
+     .      .  162: 	}
+     .      .  163:     } 
+     .      .  164: 
+     .      .  165:   //Checks length
+     .      .  166:   if (opt_sync == 'm')
+     .      .  167:     {
+     .      .  168:       for (i = 0; i < list_num; i++)
+     .      .  169: 	{
+     .      .  170: 	  int temp_len = 0;
+     .      .  171: 	  //local structure
+     .      .  172: 	  check_clock(&lock_start);
+     .      .  173: 	  pthread_mutex_lock(&mutex[i]);
+     .      .  174:       	  check_clock(&lock_end);
+     .      .  175:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  176: 	  temp_len = check_length(&list[i]);
+     .      .  177: 	  pthread_mutex_unlock(&mutex[i]);
+     .      .  178: 	  
+     .      .  179: 	  //global structure
+     .      .  180:           check_clock(&lock_start);
+     .      .  181: 	  pthread_mutex_lock(&global_mutex);
+     .      .  182:           check_clock(&lock_end);
+     .      .  183:        	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  184: 	  list_len += temp_len;
+     .      .  185: 	  pthread_mutex_unlock(&global_mutex);
+     .      .  186: 	}
+     .      .  187:     }
+     .      .  188:   else if (opt_sync == 's')
+     .      .  189:     {
+     .      .  190:       for (i = 0; i < list_num; i++)
+     .      .  191: 	{
+     .      .  192: 	  //local structure
+     .      .  193: 	  int temp_len = 0;
+     .      .  194:        	  check_clock(&lock_start);
+     1      1  195: 	  while (__sync_lock_test_and_set(&spin[i], 1));
+     .      .  196:       	  check_clock(&lock_end);
+     .      .  197:       	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  198: 	  temp_len = check_length(&list[i]);
+     .      .  199: 	  __sync_lock_release(&spin[i]);
+     .      .  200: 	  
+     .      .  201: 	  //global structure
+     .      .  202:           check_clock(&lock_start);
+     .      .  203: 	  while (__sync_lock_test_and_set(&global_spin, 1));
+     .      .  204: 	  check_clock(&lock_end);
+     .      .  205: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  206: 	  list_len += temp_len;
+     .      .  207: 	  __sync_lock_release(&global_spin);
+     .      .  208: 	}
+     .      .  209:     }
+     .      .  210:   else
+     .      .  211:     {
+     .      .  212:       for (i = 0; i < list_num; i++)
+     .      .  213: 	{
+     .      .  214: 	  int temp_len = 0;
+     .      .  215: 	  temp_len = check_length(&list[i]);
+     .      .  216: 	  list_len += temp_len;
+     .      .  217: 	}
+     .      .  218:     }
+     .      .  219: 
+     .      .  220:   //looksup and deletes
+     .      .  221:   for (i = *(int*)index; i < op_num; i += thread_num)
+     .      .  222:     {
+     .      .  223:       if (opt_sync == 'm')
+     .      .  224: 	{
+     .      .  225:  	  check_clock(&lock_start);
+     .      .  226: 	  pthread_mutex_lock(&mutex[list_ind[i]]);
+     .      .  227:        	  check_clock(&lock_end);
+     .      .  228: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .      .  229: 	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  230: 	  pthread_mutex_unlock(&mutex[list_ind[i]]);
+     .      .  231: 	}
+     .      .  232:       else if (opt_sync == 's')
+     .      .  233: 	{
+     .      .  234:        	  check_clock(&lock_start);
+   228    228  235: 	  while(__sync_lock_test_and_set(&spin[list_ind[i]], 1));
+     .      .  236:       	  check_clock(&lock_end);
+     .      .  237: 	  temp_time += clock_difference(&lock_start, &lock_end);
+     .     87  238: 	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  239: 	  __sync_lock_release(&spin[list_ind[i]]);
+     .      .  240: 	}
+     .      .  241:       else
+     .      .  242: 	{
+     .      .  243:        	  lookup_and_delete(&list[list_ind[i]], element + i);
+     .      .  244: 	}
+     .      .  245:     }  
+     .      .  246:   return (void *) temp_time;
+     .      .  247: }
+---
+     .      .  248: 
+     .      .  249: int main (int argc, char ** argv)
+     .      .  250: {
+     .      .  251:   int opt;
+     .      .  252:   int i;
