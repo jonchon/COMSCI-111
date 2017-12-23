@@ -1,0 +1,12 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+Makefile:
+Includes default, which builds the executable, clean, which removes the tarball, executable, and log file, and dist, which creates the tarball
+
+README:
+Contains descriptions of all of the files
+
+lab4b.c:
+Contains the source code in order to read from the temperature sensor in both Fahrenheit and Celsius. It also allows users to choose the period of time in which the sensor reads the temperature. 
