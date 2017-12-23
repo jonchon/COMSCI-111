@@ -1,0 +1,27 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+lab1b-client.c:
+	contained the source code that becomes the client. It supports the flags --log to log all
+	data received and sent, --port to specify the port that the server and client will talk through
+	and --encrypt which encrypts and decrypts the data when sending and receiving from the server
+
+lab1b-server.c:
+	Contains the source code that becomes the client. It supports the flags --port and --encrypt,
+	which do the same as the lab1b-client.c's --port and --encrypt
+
+my.key:
+	Contains the key that the encryption uses to decrypt the message between client and server
+
+Makefile:
+	default builds the executable files lab1b-client and lab1b-server from lab1b-client.c
+	and lab1b-server.c respectively. It also has make clean that removes the executables
+	and the tar file. It has make dist that creates the tar file.
+
+Websites I used:
+https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
+https://www.tutorialspoint.com/unix_sockets/socket_client_example.htm
+http://man7.org/linux/man-pages/man3/gethostbyname.3.html
+http://man7.org/linux/man-pages/man7/ip.7.html
+https://www.gnu.org/software/libc/manual/html_node/Host-Names.html
