@@ -1,0 +1,36 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+lab0.c
+This file includes the source code written in order to redirect standard input to standard output.
+This program allows for the following options: --input, --output, --segfault, and --catch.
+
+backtrace.png
+This photo is a screenshot of the stack on gdb after a segmentation fault has been reached.
+
+breakpoint.png
+This photo shows the value of a pointer in gdb interface right before a segmentation fault. It shows that the value of
+the pointer is NULL.
+
+Makefile
+The Makefile includes make clean, make check, and make dist to remove the files, run a smoke test, and create the tar respectively.
+
+Smoke test
+The smoke test includes tests for every single exit code. exit(2) has two tests: one for a non-existing input file
+and another for a non-writable output file. In addition, a test to compare an input file and output file was done
+in order to confirm that input output redirection was successful. 
+
+Websites Used:
+https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
+http://man7.org/linux/man-pages/man2/close.2.html
+http://man7.org/linux/man-pages/man2/open.2.html
+http://man7.org/linux/man-pages/man2/dup.2.html
+http://man7.org/linux/man-pages/man2/read.2.html
+http://man7.org/linux/man-pages/man2/write.2.html
+https://linux.die.net/man/2/exit
+http://man7.org/linux/man-pages/man2/signal.2.html
+http://man7.org/linux/man-pages/man3/getopt.3.html
+http://man7.org/linux/man-pages/man3/strerror.3.html
+https://en.wikipedia.org/wiki/Regular_expression
+http://codewiki.wikidot.com/shell-script:if-else
