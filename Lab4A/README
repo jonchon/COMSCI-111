@@ -1,0 +1,30 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+Serial Number: BBGW16062234
+MAC (board) : 2CF7F1064FF4
+wifi MAC address: b0:d5:cc:fa:4d:7b
+
+my_beaglebone.jpg:
+  This picture shows me holding up my beaglebone
+  
+connected.png:
+  This picture shows the output of ifconfig. It also shows that I changed the name
+  from root@beaglebone to root@104780881. In wlan0, it shows the inet address to be 164.67.124.254
+  
+copy.png:
+  This picture shows filezilla when I transfered helloworld.c from my computer to beaglebone
+  
+build_run.png:
+  This picture shows that I was connected to the beaglebone from a WIFI SSH (shown on the top tab)
+  using root@164.67.124.254. This picture also shows me compiling the helloworld.c program into
+  an executable and running the executable
+
+git.png:
+  This picture shows me on root@164.67.124.254, which is the WIFI SSH. It also shows me installing
+  git using sudo apt-get install git-core. Then it shows me cloning the UCLA-Plasma-Simulation-Group (since I don't have anything on my own github). It also shows me going into the OSHUN directory and using ls to show what's in the directory.
+note: had to use windows on my macbook pro through bootcamp because mac driver was not 
+working. 
+
+note2: my macbook broke halfway through the project so I had to switch to my surface pro 4.
