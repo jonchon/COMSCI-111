@@ -1,0 +1,16 @@
+NAME: Jonathan Chon
+EMAIL: jonchon@gmail.com
+ID: 104780881
+
+lab4c_tcp.c:
+Builds off of lab4b and establishes a TCP connection with the server. This program
+sends temperature reports to the server and also processes the commands sent to it
+by the server. Accepts host and port arguments to connect to the proper server
+
+lab4c_tls.c:
+Simlar to lab4c_tcp.c, but instead establishes an SSL connection with the server.
+
+Makefile:
+Supports the targets default, clean, and dist. default creates lab4c_tcp and lab4c_tls
+, which are executables from the files lab4c_tcp.c and lab4c_tls.c respectively.
+Clean removes the executables and the tarball file. Dist creates the tarball file.
